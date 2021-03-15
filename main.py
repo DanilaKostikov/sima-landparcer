@@ -83,13 +83,7 @@ class Client:
             url = container.get('href')
             url_addition = 'https://www.sima-land.ru'
             url = url_addition + url
-            for i in range(len(url)):
-                if (url[i] == '/'):
-                    n += 1
-                if (n == 5):
-                    letter = i
-
-            url = url[:(letter+1)] + 'c_id=22887&c_id=22887&is_catalog=1&' + url[(letter+1):]
+            url = url + '&c_id=22887&is_catalog=1&='
             logger.info(url)
             text = self.load_page(url)
             self.pars_page(text=text)
@@ -143,22 +137,31 @@ class Client:
         logger.debug('%s', goods_name)
 
         container = block.select('span._8fqc0._1bjFn._3CTRl')[0]
-        articul = container.text
-        articul = re.sub("[^0-9]", "", articul)
+        if container:
+            articul = container.text
+            articul = re.sub("[^0-9]", "", articul)
+        else:
+            articul = 'Артикула нет'
 
         logger.debug(articul)
 
-        container = block.select_one('span._11vAm')
-        price = container.text.strip()
-        price = re.sub("[^0-9]", "", price)
-        price = int(price)
+        if container:
+            container = block.select_one('span._11vAm')
+            price = container.text.strip()
+            price = re.sub("[^0-9]", "", price)
+            price = int(price)
+        else:
+            price = 'Цены нет'
 
         logger.debug(price)
 
         container = block.select_one('span._12UT7._9agj-._3CTRl')
-        popularity = container.text.strip()
-        popularity = re.sub("[^0-9]", "", popularity)
-        popularity = int(popularity)
+        if container:
+            popularity = container.text.strip()
+            popularity = re.sub("[^0-9]", "", popularity)
+            popularity = int(popularity)
+        else:
+            popularity = 'Отзывов нет'
 
         logger.debug(popularity)
 
@@ -178,7 +181,7 @@ class Client:
             popularity=popularity,
             rating=rating,
         ))
-
+        logger.debug(self.result)
         logger.debug('-' * 100)
 
     def save_result(self):
@@ -196,4 +199,4 @@ class Client:
 
 if __name__ == '__main__':
     parser = Client()
-    parser.load_section('https://www.sima-land.ru/muzhskaya-odezhda/?c_id=22887&c_id=22887&is_catalog=1&per-page=20&sort=price&viewtype=list')
+    parser.load_section('https://www.sima-land.ru/muzhskaya-odezhda/?per-page=20&sort=price&viewtype=list&c_id=22887&is_catalog=1&=')
