@@ -214,7 +214,21 @@ class Client:
 
         logger.debug(popularity)
 
-        rating = None
+        container = block.select_one('div.hMECb')
+
+        if container:
+            rating = container.select('svg')
+            n = 0
+            for star in rating:
+                S = star.get('class')
+                if '_3oGbd' in S:
+                    n += 1
+                if '_14iuL' in S:
+                    n += 0.5
+            rating = n
+            rating = rating/5*10
+        else:
+            rating = 'Нет отзывов.'
 
         if popularity == 0:
             rating = 'Нет отзывов.'
